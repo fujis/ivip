@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+<head>
+  <title>
+    画像・映像情報処理演習
+  </title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+  <div class="main">
+  	<div class="title">
+  	 OpenCVによる画像処理<br />(画像・映像情報処理演習)
+  	</div>
+
+    <ul class="header">
+    	<li><a href="#opencv">OpenCVについて</a></li>
+  		<li><a href="#download">OpenCVライブラリのダウンロード</a></li>
+  		<li><a href="#sample">サンプルの実行</a></li>
+  		<li><a href="#task1">演習課題1</a></li>
+  		<li><a href="#task2">演習課題2</a></li>
+      <li><a href="#task3">オプション課題</a></li>
+  		<li><a href="#report">レポート</a></li>
+  		<li><a href="#note">注意事項</a></li>
+  	</ul>
+
+
+  	<div class="content">
+  	  <a name="opencv" id="opencv"></a>
+      <h2>OpenCVについて</h2>
+      <p>
+        <a href="https://opencv.org/">OpenCV(Open Source Computer Vision Library)</a>は
+        Intel社が開発した画像に関する様々な処理を行うことができる
+        オープンソースのC/C++ライブラリである．画像処理に必要な数学的な処理(線形代数など)，画像・動画の読み込み/書き出し，
+        エッジ抽出や物体検出，物体追跡，カメラキャリブレーション，機械学習などその機能は多岐にわたる．
+        OpenCVはそれ単体で動くプログラムではなく，プログラム中でその機能を使うためのライブラリである．
+        OpenCVを使うことで複雑な画像処理プログラムをもっと簡単に書くことができるようになる．<br />
+        本演習ではOpenCVの基本的な使い方を学び，講義で行った画像処理をOpenCVでプログラミングすることで，
+        より理解を深めることを目的とする．
+      </p>
+
+  	  <a name="download" id="download"></a>
+      <h2>環境設定とサンプルプログラムの実行</h2>
+      <h4>環境設定</h4>
+      <p>
+        OpenCVはオープンソース(Apache2ライセンス)のライブラリであり，
+        Windows,Linux,Mac,Android,iOSと様々なプラットフォームに対応している．
+        今回の演習では，全学計算機システムのWindows環境を用いる．
+        その他の環境で実施する場合はそれぞれ自己責任で行うこと(環境依存の問題についてのサポートは行わない)．
+      </p>
+      <h4>サンプルプログラムの実行</h4>
+      <p>
+        下記リンクからサンプルプログラムをダウンロードする．
+      </p>
+      <p>
+        　　<strong><font size="4"><a href="sample/index.html">サンプルプログラム</a></font></strong><br />
+      </p>
+      <p>
+        ダウンロードしたzipファイル(cvproject.zip)を解凍し，
+        cvproject/src/cvproject.slnを開く．
+        実習室PCのWindows環境に入っているVisual Studio 2022(以下VS2022)での演習方法(サンプルプログラムのビルド/実行方法)は
+        以下のリンク参照
+      </p>
+      <p>
+        　　<strong><font size="4"><a href="text/gazo_enshu_visualstudio.pdf">Visual Studioを使った演習(PDFファイル)</a></font></strong><br />
+      </p>
+      <h4>他の環境での実行</h4>
+      <p>
+        実習室ではなく自身の環境で実行する場合，以下のような方法が可能．
+      </p>
+      <ul>
+        <li>
+          Windowsならば無料版のVisual Studio(Visual Studio Community)をインストールして，上記Visual Studioを使った演習に従って実行<br />
+          <strong>(参考) <a href="text/how_to_install_visualstudiocommunity.pdf">無料版VisualStudioのインストール方法</a></strong><br />
+          サンプルプログラムのVSCommunity2022での実行はこちらで確認済み．
+        </li>
+      </ul>
+      <p>
+        OpenCVはMacやLinuxなど他のプラットフォームに対応しているので，
+        ライブラリを自分の環境に合わせてダウンロードして実行することも可能であるが，
+        その場合は，インクルード,ライブラリの設定は自分で行うこと(<strong>こちらではサポートしないので自己責任で！</strong>)．
+        また，OpenCVはpythonにも対応しているので，pythonで実行してもOK(python環境が整っているなら pip opencv-python だけで導入できる．
+        Google Colaboratoryならデフォルトでopencv-pythonが入っている)．ただし，環境設定や使う関数などについては自分で調べること．
+      </p>
+      <p>
+        自分の環境で行う場合は以下の画像を右クリックし，"名前をつけてリンク先を保存"を選んで，
+        画像をプログラムの実行フォルダにダウンロードする<br />
+        <a href="image/sample512.png"><img src="image/sample512.png" alt="sample image" width="128" /></a><br />
+        次に以下のサンプルプログラムを自身のプログラム環境で入力し，実行する()．
+      </p>
+      <pre class="code">
+// インクルードファイル
+#include &#060;stdio.h&#062;
+#include &#060;opencv2/opencv.hpp&#062;
+using namespace cv; // 名前空間の設定
+
+int main(void)
+{
+	Mat img, gray;
+	img = imread("sample512.png", IMREAD_COLOR); // 画像ファイルの読み込み
+	if(img.empty()){
+		printf("Unable to load the image");
+		return 1;
+	}
+
+	cvtColor(img, gray, COLOR_BGR2GRAY);  // グレイスケールに変換
+
+	namedWindow("Display Image", WINDOW_AUTOSIZE);  // ウィンドウ生成
+	imshow("Display Image", gray);  // 画像表示
+
+	// キー待ち状態に移行
+	while(1) {
+		int c = waitKey(10);	// 引数はdelay
+		switch((char)c) {
+		case 'q':		// qキーでプログラム終了
+			return 0;
+		}
+	}
+
+	return 0;
+}</pre>
+      <p>
+        元の画像をグレイスケール化したものが表示されるはずである．画像が表示されたウィンドウを選択後，'q'キーを押すとプログラムは終了する．
+      </p>
+      <p>
+        このプログラムでは
+      </p>
+      <ol>
+        <li>imread関数で画像ファイルを読み込み(JPEG,PNG,BMP,TIFFなどに対応)</li>
+        <li>cvtColor関数にCOLOR_BGR2GRAYを指定することでカラー→グレイスケール変換</li>
+        <li>namedWindowでウィンドウを作り，imshowでグレイスケール画像を画面表示</li>
+      </ol>
+      <p>
+        をしている．最後のwaitKey関数は内部にループを持ち，ユーザがキー入力するの待ち続ける状態にする．
+        引数に時間(0以外)を指定するとその時間後に入力されたキーを返す．このサンプルではその情報を使って，
+        キーボードによる操作を行っている('q'キーを押すとプログラム終了)．<br />
+        画像はMatという型に格納される．Matは画像だけでなく，実行結果や行列などOpenCVにおける様々な配列要素を格納するのに用いられている．
+      </p>
+
+
+  	  <a name="task1" id="task1"></a>
+      <h2>演習課題1</h2>
+      <p>
+        サンプルプログラムを変更し，以下の機能をつけよ．
+      </p>
+      <ul>
+        <li>ユーザが入力した閾値による2値化</li>
+        <li>判別分析法(大津の方法)による2値化</li>
+        <li>結果画像のファイル保存機能(ファイルフォーマットは自由)</li>
+      </ul>
+      <p>
+        <strong>グレイスケール化した後に2値化すること</strong>(グレイスケール化の方法は上記サンプル参照)．
+      </p>
+      <p>
+        以下の画像(右クリックして「名前をつけてリンク先を保存」)に対して，
+        閾値を自分で調整して2値化した結果と判別分析法で自動的に2値化した結果を比べよ．
+        余裕のある人は画像を領域に分けて，領域毎に2値化していく適応的2値化も試してみよう．
+        <br />
+        <a href="image/lamp.png"><img src="image/lamp.png" alt="sample image" width="128" /></a>
+      </p>
+      <p>
+        なお，ユーザによる値の入力方法はどのようなものでもよい．<br />
+        例: 特定のキー入力で値を増減させる，scanfを用いてターミナルから入力，など．<br />
+        時間に余裕のある人は
+        <a href="http://docs.opencv.org/3.0-beta/doc/tutorials/highgui/trackbar/trackbar.html">こちらのページ</a>を参考にして
+        閾値を増減させるGUI(Trackbar)を実装してみよう．
+      </p>
+      <p>
+        上記画像をグレイスケール化したもののヒストグラムを以下に示す．考察時に必要に応じて用いてもよい．
+        <br />
+        <img src="image/lamp_histogram.png" alt="histogram" />
+      </p>
+      <p>
+        <b>参考(OpenCVの関数)</b>
+        <ul>
+          <li>フィルタ処理<br />
+            <pre class="code">threshold(const Mat &src, Mat &dst, double thresh, double maxval, int type)</pre>
+            <p>
+              画像の2値化を行う．
+              引数srcで指定する入力画像はグレイスケール画像(8 or 32ビットのシングルチャンネル画像)でなければならない．
+              出力画像は引数dstで受け取る．
+              threshは2値化の閾値で判別分析法の場合はどんな値を指定しても無視される．
+              maxvalは2値化の結果として設定する画素の値であり，基本的には255としておけばよい．<br />
+              typeは2値化の方法を指定するための引数で以下のようなものがある．
+            </p>
+            <ul>
+              <li>THRESH_BINARY : 閾値以下の画素は0，それ以外はmaxvalにする</li>
+              <li>THRESH_BINARY_INV : 閾値以下の画素はmaxval，それ以外は0にする</li>
+              <li>THRESH_TRUNC : 閾値を超える画素をthresにする(それ以外は変更しない)</li>
+              <li>THRESH_TOZERO : 閾値以下の画素を0にする(それ以外は変更しない)</li>
+              <li>THRESH_TOZERO_INV : 閾値を超える画素を0にする(それ以外は変更しない)</li>
+              <li>THRESH_OTSU : 判別分析法(大津の方法)で閾値を決定する．上記5つと併せて指定する</li>
+            </ul>
+            <p>
+             基本的にはTHRESH_BINARYを用い，判別分析法を用いる場合はこれにプラスしてTHRESH_OTSUも指定する．
+             2つ以上のフラグをしてする場合は単純に足す(例.THRESH_BINARY+THRESH_OTSU)かOR演算する
+             (例.THRESH_BINARY | THRESH_OTSU)．
+             ちなみに上の5つは同時指定できないので注意．
+            </p>
+    
+            <pre class="code">adaptiveThreshold(const Mat &src, Mat &dst, double maxValue, int adaptiveMethod,
+          int thresholdType, int blockSize, double C)</pre>
+            <p>
+              適応的2値化を行う．
+              maxValueはthreshold関数のmaxvalと同じ．
+              adaptiveMethodにはADAPTIVE_THRESH_MEAN_CかADAPTIVE_THRESH_GAUSSIAN_Cを指定(前者は単純に周囲画素の平均,
+              後者はガウシアンを重みとした総和から最後の引数Cの値を引いたものを閾値として用いる)．
+              thresholdTypeは2値化の方法でTHRESH_BINARYかTHRESH_BINARY_INV，
+              blockSizeは近傍領域のサイズで1,3,5のように奇数を指定する．
+            </p>
+          </li>
+          <li>画像ファイル保存<br />
+            <pre class="code">imwrite(const string &filename, const Mat &img, const vector&#060;int&#062; &#038;params=vector&#060;int&#062;())</pre>
+            <p>
+              画像をファイル保存する．filenameの拡張子(bmp,png,jpgなど)で画像フォーマットは決まる．
+              第3引数では保存パラメータとして，JPEGの品質，PNGの圧縮レベルなどを指定できるが，
+              何も指定しなければデフォルト値(JPEG:95,PNG:3)が使われる．
+            </p>
+          </li>
+        </ul>
+      </p>
+
+
+  	  <a name="task2" id="task2"></a>
+      <h2>演習課題2</h2>
+      <p>
+		以下の画像の前景領域をGrabCut法を用いて抽出せよ．
+		そして，背景領域を黒く塗りつぶして，前景領域のみを表示した画像を生成し，
+		抽出された領域，反復処理回数による違いなどを考察せよ．
+		ただし，前景領域抽出のための初期シード領域は講義内でデモしたようなマウスで示すものではなく，
+		矩形領域を指定するものでよい(詳しくは参考のところを参照してほしい)．<br />
+        <br />
+        前景領域抽出用画像<br />
+        <a href="image/lamp.png"><img src="image/lamp.png" alt="sample image 1" width="256" /></a><br />
+      </p>
+      <p>
+        <b>ヒント : </b> 矩形領域は最初は元画像を縮小したものを用いてみよう(元画像と同じだと背景初期シードがないことになりエラーとなる)．
+		余裕のある人はオプション課題にもあるようにマウスのD&Dで矩形領域を指定できるようにしてみよう．
+      </p>
+      <p>
+        <b>参考(OpenCVの関数)</b><br />
+		<ul>
+		  <li>グラフカット<br />
+            <pre class="code">void grabCut(const Mat& img, Mat& mask, Rect rect, Mat& bgdModel, Mat& fgdModel, int iterCount, int mode)</pre>
+            <p>
+    		  入力画像imgをグラフカット法で領域抽出して，その結果をマスク(mask)として返す．
+			  矩形領域rectはcv::Rect型の変数で指定する．例えば，元画像を上下左右に1ピクセルだけ小さくした領域は，
+		    </p>
+			<pre class="code">cv::Rect rect;
+rect.x = 1;  rect.y = 1;
+rect.width = img.cols-2;  rect.height = img.rows-2;</pre>
+			<p>
+			  と定義できる．
+            </p>
+			<p>
+			  bdgModelとfgdModelはgrabCut関数内部で一時的な配列として使われる変数であり，それぞれMat型で定義した変数を初期化しないで渡せばよい．
+			  iterCountでは講義で説明した処理全体を何回繰り返して処理するかの反復回数を指定するものである．
+			  最後のmodeにはGC_INIT_WITH_RECTかGC_INIT_WITH_MASKを指定する．矩形領域を用いる場合はGC_INIT_WITH_RECTでよい．
+			</p>
+      <p>
+        なお，grabCut関数を実行する前にマスク(mask)は入力画像と同じ大きさのグレイスケール画像(CV_8UC1)として定義し，
+        その全ピクセル値を以下のようにしてGC_BGD(下記参照)で初期化しておくこと．
+      </p>
+      <pre class="code">mask.setTo(Scalar::all(GC_BGD));</pre>
+		  </li>
+		  <li>バイナリマスクを用いた画像コピー<br />
+            <p>
+			  grabCut関数で得られたマスク(mask)の各ピクセルには以下の4つの値のいずれかが格納されている．
+			  <ul>
+				  <li>GC_BGD : 背景ピクセル(=0)</li>
+				  <li>GC_FGD : 前景ピクセル(=1)</li>
+				  <li>GC_PR_BGD : 背景の可能性のあるピクセル(=2)</li>
+				  <li>GC_PR_FGD : 前景の可能性のあるピクセル(=3)</li>
+			  </ul>
+		    </p>
+		    <p>
+			  マスクを用いて前景領域のみを抜き出した画像(背景領域を黒にした画像)を得る場合は，
+			  単純にcv::MatのcopyTo関数の第二引数にマスクを指定すればよいが，
+			  copyTo関数で指定するマスクは0か1の値を持つバイナリマスクであり，
+			  grabCut関数で得られた4値を持つマスクはそのままでは使えない．
+            </p>
+			<p>
+			  バイナリマスクへの変換には論理演算を用いる．下記のように処理することでバイナリマスクへの変換が可能となる．
+            </p>
+			<pre class="code">mask = mask & 1;  // 各ピクセルで1と論理積をとる(値が0のピクセル以外は1になる)
+img.copyTo(dst, mask); // バイナリマスクを用いた前景画像の生成</pre>
+		  </li>
+	    </ul>
+      <p><br /></p>
+
+
+	  <a name="task3" id="task3"></a>
+      <h2>オプション課題(時間に余裕のある人用)</h2>
+      <p>
+        時間に余裕がある人は下記画像のように，前景及び背景の初期シードをマウスのドラッグ操作で指定できるようにしてみよう．
+		また，単純な矩形を初期値にした場合ではうまくいかない画像(画像処理でよく使われるLena画像など)を探して，
+    マウスによる指定を試してみよう．<br />
+    (Google colabratory + Pythonの環境だとマウスによる指定は難しいので，別途自身で用意したストロークを書いたマスク画像を使うのでもOK)
+        <br />
+        マウスでシードを指定した例<br />
+        <a href="image/grabcut_rcube.jpg"><img src="image/grabcut_rcube.jpg" alt="seed image" width="256" /></a><br />
+      </p>
+      <p>
+        <b>参考(OpenCVの関数)</b><br />
+        <ul>
+		  <li>マウスコールバック<br />
+             <pre class="code">void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata)</pre>
+             <p>
+			   マウスコールバック関数を指定する．マウスコールバック関数とは，winnameで指定したウィンドウ上で，
+			   何らかのマウス操作(クリックやドラッグ)をしたときに呼ばれる関数を指定する．
+		     </p>
+		     <p>
+			   引数onMouseに自分で作った関数の名前を指定すればよい．
+			   ただし，関数の形式(返値,引数など)は決まっている点には注意．
+			   以下にマウスコールバック関数の例を示す．
+             </p>
+			 <pre class="code">/*!
+ * マウスコールバック関数
+ * @param[in] event マウスイベントID:EVENT_LBUTTONDOWN,RBUTTONDOWN,LBUTTONUP,RBUTTONUP,MOUSEMOVE
+ * @param[in] x,y マウス座標
+ * @param[in] flags Shift,Ctrlなどの修飾キーの状態:EVENT_FLAG_CTRLKEY,SHIFTKEY
+ * @param[in] param ユーザーデータ
+ */
+void onMouse(int event, int x, int y, int flags, void* param)
+{
+	static int state = 0;
+	switch(event){
+	case EVENT_LBUTTONDOWN:
+		// マウス左ボタンが"押された"ときの処理をここに書く
+		// 引数x,yにはそのときのマウス座標が格納されている
+		・・・
+		state = 1;
+		break;
+	case EVENT_LBUTTONUP:
+		// マウス左ボタンが"離された"ときの処理をここに書く
+		・・・
+		state = 0;
+		break;
+	case EVENT_MOUSEMOVE:
+		// マウスが動いたときの処理をここに書く
+		// 注意としてドラッグ(ボタンを押したまま移動)時だけでなく，
+		// ボタンを押さないで動かした場合も呼ばれてるので，
+		// ドラッグを検出するためにここではstateというstatic変数を用いている．
+		if(state){
+			・・・
+		}
+		break;
+	}
+}</pre>
+           </li>
+        </ul>
+      </p>
+      <p>
+        <strong>ヒント : </strong> マウス座標によってマスクを変更するには，
+		circle関数などの図形描画関数を用いるとよい．
+		例えば，マウスでクリックした位置(x,y)を中心とした半径3ピクセルの領域を前景シードとするには，
+      </p>
+	  <pre class="code">circle(mask, Point(x,y), 3, GC_FGD, -1);</pre>
+	  <p>
+		とすればよい(背景シードの場合はGC_BGDを指定)．最後の引数を-1としているのは円の中身を指定した色で埋めるためである．
+		これをマウスクリック時やドラッグ時に指定する．
+	  </p>
+	  <p>
+        マウスで指定したシード領域を描画に反映させたい場合は，書くピクセル毎にマスクの値で値を変えてやればよい．
+		描画用の画像をimgとすると，
+      </p>
+	  <pre class="code">for(int j = 0; j < img.rows; ++j){
+	for(int i = 0; i < img.cols; ++i){
+		if(mask.at<uchar>(j, i) == GC_FGD){
+			img.at<cv::Vec3b>(j, i)[0] = cv::saturate_cast<uchar>(200);
+			img.at<cv::Vec3b>(j, i)[1] = cv::saturate_cast<uchar>(200);
+			img.at<cv::Vec3b>(j, i)[2] = cv::saturate_cast<uchar>(200);
+		}
+		else if(mask.at<uchar>(j, i) == GC_BGD){
+			img.at<cv::Vec3b>(j, i)[0] = cv::saturate_cast<uchar>(100);
+			img.at<cv::Vec3b>(j, i)[1] = cv::saturate_cast<uchar>(100);
+			img.at<cv::Vec3b>(j, i)[2] = cv::saturate_cast<uchar>(100);
+		}
+	}
+}</pre>
+	  <p>
+		とすると，前景シード領域を明るい灰色，背景シード領域を暗い灰色にしてくれる．
+	  </p>
+      <p><br /></p>
+
+
+
+  	  <a name="report" id="report"></a>
+      <h2>レポート</h2>
+      <p>
+        演習課題1と2(+やった人はオプション課題)について，画像処理した画像，元画像，使用した手法・パラメータなどの説明，結果に対する考察をまとめて，
+        レポートとしてPDFにしたものを<a href="https://manaba.tsukuba.ac.jp/ct/course_2911343">manaba「画像・映像情報処理」</a>の「レポート」
+        の「実習（後半）レポート（締め切り12/27(水)21:00）」に提出せよ．
+        なお，作成したソースコード(.c/.cppファイル)も提出すること(ソースコードのファイル数が多くなる場合はZIPかTARでまとめてから提出)<br />
+        <br />
+        レポートの締め切りは<strong>2023年12月27(水) 21:00</strong>までとする．
+        間に合わなかった場合も1週間はmanaba上で提出を受け付ける(ただし減点あり)が，それ以降は受け取らない．
+      </p>
+      <p><br /></p>
+
+
+  	  <a name="note" id="note"></a>
+      <h2>注意事項</h2>
+      <h4>C++インタフェースについて</h4>
+      <p>
+       OpenCVではバージョン2.0以降，従来のC言語によるものだけでなく，
+       C++によるインタフェースを提供している(3.0以降はC++が標準になり，C言語の方は更新されなくなる)．
+       本演習で示すサンプルコードはすべてC++インタフェースを使っている．
+       従来のものとの主要な違いは以下．
+       <ul>
+         <li>cv名前空間 : 関数，変数はすべてcvという名前空間に属している．サンプルコードの最初の方に書いてあるように
+             <pre class="code">using namespace cv;</pre>と宣言すれば特に気にする必要は無い．
+             この宣言なしの場合は，OpenCVの変数，関数を呼び出すときに常に"cv::"をつける必要がある．
+             たとえば，
+             <pre class="code">cv::Mat img, gray;
+img = cv::imread("sample512.png", IMREAD_COLOR);</pre>
+         </li>
+         <li>関数名の変更 : 従来，OpenCVの関数はcvという接頭辞がついていた(たとえば，cvLoadImage)．
+             C++インタフェースではこれが取り除かれている．従来の関数名から変換する場合は，関数名の先頭の"cv"と取り除き，
+             その後の大文字を小文字に返ればよい．たとえば，"cvMinMaxLoc"関数は"minMaxLoc"となる．
+             ただし，一部の関数は別の名前になっている．詳しくは<a href="http://opencv.jp/reference_manual">opencv.jpのreference manual</a>参照．
+         </li>
+         <li>
+           IplImageとCvMatの統合 : 画像を格納するのに使われていたIplImage型と行列等を格納するのに使われていたCvMat型は統合され，
+           まとめてcv::Mat型になった．さらに3.0以降ではOpenCLを導入しているとCPU/GPU両方で共通して使えるUMatという型も新しく導入されている．
+         </li>
+         <li>
+           メモリ解放の自動化(ガーベジコレクション) : cv::imreadやcv::VideoCaptureなどOpenCV側で自動確保されたメモリに関してはその参照がなくなったときに自動で解放されるようになった．
+           また，スマートポインタであるPtrクラスを使うとメモリは自動的に解放してくれる(参照カウンタが0になるとdelete_obj()という関数が呼ばれて解放される)．
+           これら以外の手動で確保したメモリ領域に関してはちゃんと解放すること．
+         </li>
+         <li>
+           その他 : テンプレートクラス化，演算子のオーバーロードなど．
+         </li>
+       </ul>
+      </p>
+
+  	<div class="footer">
+  	</div>
+  </div>
+</body>
+</html>
