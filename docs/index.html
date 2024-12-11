@@ -59,11 +59,6 @@
         　　<strong><font size="4"><a href="sample/index.html">サンプルプログラム</a></font></strong><br />
       </p>
       <p>
-        <strong> 2023.12/18追記 : プロジェクト設定のミスがありましたので，12/18の授業中にサンプルファイルを差し替えました</strong>
-        (詳細については授業で説明済み)．
-        それ以前にダウンロードしていた人は再ダウンロードしてください．
-      </p>
-      <p>
         ダウンロードしたzipファイル(cvproject.zip)を解凍し，
         cvproject/src/cvproject.slnを開く．
         実習室PCのWindows環境に入っているVisual Studio 2022(以下VS2022)での演習方法(サンプルプログラムのビルド/実行方法)は
@@ -145,55 +140,58 @@ int main(void)
         画像はMatという型に格納される．Matは画像だけでなく，実行結果や行列などOpenCVにおける様々な配列要素を格納するのに用いられている．
       </p>
 
-      <h2>演習課題</h2>
-      <p><strong>2024年度の課題は実習を行う回の前に公開します．</strong></p>
-<!--
-  	  <a name="task1" id="task1"></a>
+
+
+      <a name="task1" id="task1"></a>
       <h2>演習課題1</h2>
       <p>
-        サンプルプログラムを変更し，以下の画像処理を実行せよ．
+        サンプルプログラムを変更し，以下の機能をつけよ．
       </p>
       <ul>
-        <li>ソーベル(Sobel)フィルタによるエッジ検出画像の作成</li>
-        <li>エッジ検出パラメータ(マスクサイズ)を変更したときのエッジ画像の生成</li>
-        <li>2次微分によるエッジ検出(ラプラシアンフィルタ)とキャニー(Canny)アルゴリズムによるエッジ検出画像の生成</li>
+		    <li>メディアンフィルタによる画像平滑化</li>
+        <li>キーボードで平滑化パラメータ(マスクサイズ)を変更できる機能</li>
+        <li>結果画像のファイル保存機能(ファイルフォーマットは自由)</li>
       </ul>
       <p>
-        以下の画像(右クリックして「名前をつけてリンク先を保存」)に対して上記をすべて適用し，その結果を比べよ．<br />
-        <a href="image/lamp.png"><img src="image/lamp.png" alt="sample image" width="128" /></a>
+        さらに，メディアンフィルタの他に，ガウシアンフィルタ，バイラテラルフィルタによる平滑化も行い，
+        以下の異なるノイズを加えた2つの画像(右クリックして「名前をつけてリンク先を保存」)に対して適用し，その結果を比べよ．<br />
+        <a href="image/rcube_noise.png"><img src="image/rcube_noise.png" alt="sample image" width="256" /></a>
+        <a href="image/rcube_noise2.png"><img src="image/rcube_noise2.png" alt="sample image 2" width="256" /></a>
+        <br />
+        (参考 : <a href="image/rcube.png">ノイズなしの元画像</a>)
       </p>
       <p>
         <b>参考(OpenCVの関数)</b>
-        <pre class="code">Sobel(const Mat &src, Mat &dst, int ddepth, int dx, int dy, int ksize)</pre>
-        <p>
-          ソーベルフィルタで画像のエッジ検出を行う．
-          ddepthは出力画像のビット深度でCV_8UやCV_32Fなどを指定
-          (CV_32Fは浮動小数点数なので画面や画像として出力する際にはconvertScaleAbsでCV_8Uに変換すること)．
-          dx,dyはx,y方向の微分次数，ksizeはカーネルサイズ(マスクの大きさ，1以上の奇数)．
-        </p>
-        <pre class="code">Laplacian(const Mat &src, Mat &dst, int ddepth, int ksize)</pre>
-        <p>
-          ラプラシアンフィルタによるエッジ検出を行う．
-          ddepthは出力画像のビット深度，ksizeはカーネルサイズ(マスクの大きさ，1以上の奇数),
-        </p>
-        <pre class="code">Canny(const Mat &src, Mat &dst, double threshold1, double threshold2,
-      int apertureSize = 3, bool L2gradient = false)</pre>
-        <p>
-          キャニーアルゴリズム(参考:<a href="http://en.wikipedia.org/wiki/Canny_edge_detector">Canny edge detector(wikipedia)</a>)によるエッジ検出を行う．
-          キャニーアルゴリズムではガウシアンフィルタでノイズを減らした後，ソーベルフィルタでエッジ検出，細線化した後，
-          2つのヒステリシス(hysteresis)閾値を使って各画素がエッジかどうかを判断する．<br />
-          threshold1とthreshold2はヒステリシスで使う2つの閾値(LowとHigh)であり，aperturSizeはソーベルフィルタのカーネルサイズである．
-        </p>
-        <pre class="code">imwrite(const string &filename, const Mat &img, const vector&#060;int&#062; &#038;params=vector&#060;int&#062;())</pre>
-        <p>
-          画像をファイル保存する．filenameの拡張子(bmp,png,jpgなど)で画像フォーマットは決まる．
-          第3引数では保存パラメータとして，JPEGの品質，PNGの圧縮レベルなどを指定できるが，
-          何も指定しなければデフォルト値(JPEG:95,PNG:3)が使われる．
-        </p>
-        <p>
-          <strong>ヒント : </strong> エッジ画像に色が付いてしまっている場合は，
-          cvtColorを使ってグレイスケールに変換した後にエッジ抽出すればよい．
-        </p>
+        <ul>
+          <li>フィルタ処理<br />
+          <pre class="code">medianBlur(const Mat &src, Mat &dst, int ksize)</pre>
+          <p>
+            メディアンフィルタで画像の平滑化を行う．ksizeはカーネルサイズ(マスクの大きさ，1以上の奇数)．
+          </p>
+          <pre class="code">GaussianBlur(const Mat &src, Mat &dst, Size ksize, double sigmaX, double sigmaY)</pre>
+          <p>
+            ガウシアンフィルタによる画像の平滑化を行う．ksizeはカーネルサイズ(マスクの大きさ，1以上の奇数),
+            sigmaXとsigmaYはX,Y方向の標準偏差で0にした場合は，ksizeから計算される．
+          </p>
+          <pre class="code">bilateralFilter(const Mat &src, Mat &dst, int d, double sigmaColor, double sigmaSpace)</pre>
+          <p>
+          　<a href="bilateral_filter.html">バイラテラルフィルタ</a>で画像を平滑化する．
+            dはピクセル近傍距離直径(＜0ならsigmaSpaceから計算される)，
+            sigmaColor, sigmaSpaceは色空間，座標空間におけるフィルタのσ値
+            (sigmaSpaceはガウシアンのσと同じ，
+            sigmaColorは中心の輝度値との差をどの程度許容するかを制御する係数で大きくするとガウシアンフィルタに近づき，
+            小さくするとノイズが残る)．
+          </p>
+          </li>
+          <li>画像ファイル保存<br />
+            <pre class="code">imwrite(const string &filename, const Mat &img, const vector&#060;int&#062; &#038;params=vector&#060;int&#062;())</pre>
+            <p>
+              画像をファイル保存する．filenameの拡張子(bmp,png,jpgなど)で画像フォーマットは決まる．
+              第3引数では保存パラメータとして，JPEGの品質，PNGの圧縮レベルなどを指定できるが，
+              何も指定しなければデフォルト値(JPEG:95,PNG:3)が使われる．
+            </p>
+          </li>
+        </ul>
       </p>
 
   
@@ -201,200 +199,164 @@ int main(void)
   	  <a name="task2" id="task2"></a>
       <h2>演習課題2</h2>
       <p>
-        以下のターゲット画像1からマッチング画像とマッチする局所特徴点を探し出し，その結果を点と線で示せ．
-        また，ターゲット画像2についても同様に結果を表示してみよ．<br />
-        局所特徴量の種類は何でも良いが，拡張モジュールを導入していないOpenCV3以降では"SIFT"や"SURF"は使えないので注意．
-        これ以降の説明(特に参考のところ)では"ORB"を用いている．
-        他に<a href="https://www.youtube.com/watch?v=LWY-w8AGGhE">平面トラッキングにより強い</a>KAZE,AKAZEも使える．
-        <br /><br />
-        マッチング画像(右クリックして「名前をつけてリンク先を保存」)<br />
-        <a href="image/matching.png"><img src="image/matching.png" alt="target image" width="128" /></a><br />
+		以下の画像の前景領域をGrabCut法を用いて抽出せよ．
+		そして，背景領域を黒く塗りつぶして，前景領域のみを表示した画像を生成し，
+		抽出された領域，反復処理回数による違いなどを考察せよ．
+		ただし，前景領域抽出のための初期シード領域は講義内でデモしたようなマウスで示すものではなく，
+		矩形領域を指定するものでよい(詳しくは参考のところを参照してほしい)．<br />
         <br />
-        ターゲット画像1(右クリックして「名前をつけてリンク先を保存」)<br />
-        <a href="image/target1.png"><img src="image/target1.png" alt="image1" width="256" /></a><br />
-        ターゲット画像2<br />
-        <a href="image/target2.png"><img src="image/target2.png" alt="image2" width="256" /></a><br />
+        前景領域抽出用画像<br />
+        <a href="image/lamp.png"><img src="image/lamp.png" alt="sample image 1" width="256" /></a><br />
+      </p>
+      <p>
+        <b>ヒント : </b> 矩形領域は最初は元画像を縮小したものを用いてみよう(元画像と同じだと背景初期シードがないことになりエラーとなる)．
+		余裕のある人はオプション課題にもあるようにマウスのD&Dで矩形領域を指定できるようにしてみよう．
       </p>
       <p>
         <b>参考(OpenCVの関数)</b><br />
-        ORB以外の特徴量を用いる場合は下記ORBの部分をすべてその特徴量名(KAZEやAKAZE,BRISKなど)で置き換えること．
-        <ul>
-          <li>
-            <strong>特徴点検出＆特徴量計算</strong>
-            <pre class="code">Ptr&#060;ORB> ORB::create(int nfeatures,...)</pre>
+		<ul>
+		  <li>グラフカット<br />
+            <pre class="code">void grabCut(const Mat& img, Mat& mask, Rect rect, Mat& bgdModel, Mat& fgdModel, int iterCount, int mode)</pre>
             <p>
-              特徴点(キーポイント)検出器を生成する．
-              引数のnfeaturesには特徴の最大数(あくまで最大でここで指定した数の点が必ず得られるわけではない)を指定する．
-              指定しなければデフォルトの500が使われる．
-              そのほかに引数に様々なパラメータを指定できる．
-              上記以外の引数については
-              <a href="http://docs.opencv.org/trunk/db/d95/classcv_1_1ORB.html#adc371099dc902a9674bd98936e79739c">OpenCVのドキュメント</a>
-              を参照してほしい．なお引数は特徴量の種類によって違うので注意．
+    		  入力画像imgをグラフカット法で領域抽出して，その結果をマスク(mask)として返す．
+			  矩形領域rectはcv::Rect型の変数で指定する．例えば，元画像を上下左右に1ピクセルだけ小さくした領域は，
+		    </p>
+			<pre class="code">cv::Rect rect;
+rect.x = 1;  rect.y = 1;
+rect.width = img.cols-2;  rect.height = img.rows-2;</pre>
+			<p>
+			  と定義できる．
             </p>
-            <p>
-              実際にキーポイントを抽出し特徴量を計算するためには ORB型のポインタ(Ptr&#060;ORB>はORB型のポインタ)とdetect関数,compute関数を使って，
-            </p>
-            <pre class="code">Ptr&#060;ORB></FeatureDetector> feature = ORB::create(1500)
-std::vector&#060;KeyPoint> keypoints;
-feature->detect(image, keypoints);
-
-Mat descriptor;
-feature->compute(image, keypoints, descriptor);</pre>
-            <p>
-              とすることで，配列keypointsにキーポイントの情報が格納され，
-              行列descriptorに特徴量が格納される．
-              std::vectorは容量可変の動的配列型である．
-              detect,compute関数の第一引数には探索したい画像(Mat型)を渡す．
-            </p>
-          </li>
-
-          <li>
-            <strong>特徴点のマッチング</strong>
-            <pre class="code">Ptr&#060;DescriptorMatcher> DescriptorMatcher::create(const string& descriptorMatcherType )</pre>
-            <p>
-              2つの画像の特徴量情報からそれぞれマッチする特徴点を探し出す．
-              descriptorMatcherTypeにはマッチングのアルゴリズムを文字列で指定する．
-              文字列には以下を指定できる．
-              <table>
-                <tr><th>文字列</th><th>マッチングに使う距離</th></tr>
-                <tr><td>"BruteForce"</td><td>L2距離</td></tr>
-                <tr><td>"BruteForce-L1"</td><td>L1距離</td></tr>
-                <tr><td>"BruteForce-SL2"</td><td>L2距離(平方根計算なし)</td></tr>
-                <tr><td>"BruteForce-Hamming"</td><td>ハミング距離</td></tr>
-                <tr><td>"BruteForce-Hamming(2)"</td><td>ハミング距離(<a href="http://docs.opencv.org/trunk/db/d95/classcv_1_1ORB.html#adc371099dc902a9674bd98936e79739c">ORBのパラメータ</a>でWTA_Kを3か4にした場合はこちらを使う．<br />デフォルトは2なので何も変更してなければ"BruteForce-Hamming"でよい)
-              </td></tr>
-                <tr><td>"FlannBased"</td><td><a href="http://www.cs.ubc.ca/research/flann/">FLANN</a>を用いたマッチング</td></tr>
-              </table>
-            </p>
-            <p>
-              BRISK,ORBのようにバイナリ値を用いる特徴量計算機に対してはL1,L2距離ではなくハミング距離を用いるのが一般的である．また，FlannBasedはORBと組み合わせて用いた場合，エラーとなり使えない(FlannBasedはデフォルトでL2距離を使うため)．ORBを使う場合は別のアルゴリズムを用いるようにしよう
-              (FlannBasedMatcherでindexParamにflann::LshIndexParamsを指定すれば使える？)．
-            </p>
-            <p>
-              FeatureDetectorの時と同じように，実際にマッチングする際には，
-               DescriptorMatcher型のポインタとmatch関数を使って，
-            </p>
-            <pre class="code">Ptr&#060;DescriptorMatcher> matcher = DescriptorMatcher::create("BruteForce-Hamming")
-std::vector&#060;cv::DMatch> matches;
-matcher->match(descriptor1, descriptor2, matches);</pre>
-            <p>
-              とすることで，配列matchesにマッチング結果が格納される．
-              match関数の第一,二引数には特徴点検出＆特徴量計算のところで計算した特徴量を格納した行列(マッチング画像とターゲット画像)を渡す．
-            </p>
-            <p><br /></p>
-          </li>
-
-          <li>
-            <strong>マッチング結果の表示</strong>
-            <pre class="code">void drawMatches(const Mat& img1,
-                 const vector&#060;KeyPoint>& keypoints1,
-                 const Mat& img2,
-                 const vector&#060;KeyPoint>& keypoints2,
-                 const vector&#060;DMatch>& matches1to2,
-                 Mat& outImg,
-                 const Scalar& matchColor=Scalar::all(-1),
-                 const Scalar& singlePointColor=Scalar::all(-1),
-                 const vector&#060;char>& matchesMask=vector&#060;char&#062;(),
-                 int flags=DrawMatchesFlags::DEFAULT );</pre>
-            <p>
-             ターゲット画像とターゲット画像を並べて表示し，それぞれの特徴点およびマッチング結果を点と線で描画した画像を生成する．
-             img1,img2にそれぞれ画像，keypoint1,keypoint2に各画像の特徴点情報，
-             matches1to2にマッチング結果，outImgに出力画像(画面に表示する画像)を指定する．
-             outImg以降の引数で線や点の色などを設定できるが特にデフォルトから変更なければ指定しなくてもよい．
-            </p>
-          </li>
-         <li>
-           局所特徴量の計算ではstd::vectorという動的配列型が使われている．
-           これはStandard Template Libraryというライブラリの機能であり，ほとんどのC++プログラム開発環境でサポートされている
-           標準的なものである．<br />
-           std::vectorでは宣言時に型を指定する．例えばint型の配列ならば，
-           <pre class="code">std::vector&#060;int&#062; x</pre>
-           とする．通常の配列宣言と異なり，x[10]のように宣言時に配列のサイズを指定する必要がない．
-           配列のサイズは必要に応じて動的に変更することができる．<br />
-           配列の要素にアクセスする時は通常の配列と同じようにすればよい(例えばi番目の要素ならx[i])．
-           また，現在の配列の大きさを知りたい場合はsize関数を用いる．
-           <pre class="code">int n = x.size()</pre>
-         </li>
-        </ul>
-      </p>
+			<p>
+			  bdgModelとfgdModelはgrabCut関数内部で一時的な配列として使われる変数であり，それぞれMat型で定義した変数を初期化しないで渡せばよい．
+			  iterCountでは講義で説明した処理全体を何回繰り返して処理するかの反復回数を指定するものである．
+			  最後のmodeにはGC_INIT_WITH_RECTかGC_INIT_WITH_MASKを指定する．矩形領域を用いる場合はGC_INIT_WITH_RECTでよい．
+			</p>
       <p>
-        <strong>ヒント : </strong> ターゲット画像，マッチング画像はcvtColorを使ってグレイスケールに変換しておくこと．
-        両画像についてそれぞれキーポイントと特徴量を計算して，両者のマッチングを取り，drawMatches関数で結果画像を作って，
-        それをimshow関数に渡すことで描画する．
+        なお，grabCut関数を実行する前にマスク(mask)は入力画像と同じ大きさのグレイスケール画像(CV_8UC1)として定義し，
+        その全ピクセル値を以下のようにしてGC_BGD(下記参照)で初期化しておくこと．
       </p>
+      <pre class="code">mask.setTo(Scalar::all(GC_BGD));</pre>
+		  </li>
+		  <li>バイナリマスクを用いた画像コピー<br />
+            <p>
+			  grabCut関数で得られたマスク(mask)の各ピクセルには以下の4つの値のいずれかが格納されている．
+			  <ul>
+				  <li>GC_BGD : 背景ピクセル(=0)</li>
+				  <li>GC_FGD : 前景ピクセル(=1)</li>
+				  <li>GC_PR_BGD : 背景の可能性のあるピクセル(=2)</li>
+				  <li>GC_PR_FGD : 前景の可能性のあるピクセル(=3)</li>
+			  </ul>
+		    </p>
+		    <p>
+			  マスクを用いて前景領域のみを抜き出した画像(背景領域を黒にした画像)を得る場合は，
+			  単純にcv::MatのcopyTo関数の第二引数にマスクを指定すればよいが，
+			  copyTo関数で指定するマスクは0か1の値を持つバイナリマスクであり，
+			  grabCut関数で得られた4値を持つマスクはそのままでは使えない．
+            </p>
+			<p>
+			  バイナリマスクへの変換には論理演算を用いる．下記のように処理することでバイナリマスクへの変換が可能となる．
+            </p>
+			<pre class="code">mask = mask & 1;  // 各ピクセルで1と論理積をとる(値が0のピクセル以外は1になる)
+img.copyTo(dst, mask); // バイナリマスクを用いた前景画像の生成</pre>
+		  </li>
+	    </ul>
       <p><br /></p>
 
 
-      <a name="task3" id="task3"></a>
+	  <a name="task3" id="task3"></a>
       <h2>オプション課題(時間に余裕のある人用)</h2>
       <p>
-        時間に余裕がある人は得られた特徴点ペアからRANSACにより以下の2枚の画像の位置関係を表すホモグラフィ行列(射影変換行列)を求め，
-        その行列に基づき2枚の画像を合成して一枚のパノラマ画像を作成してみよう(自分が撮影した画像を用いてもよい)．
-        <br /><br />
-        <table border="0">
-          <tr><th>画像1</th><th>画像2</th></tr>
-          <tr>
-            <td><a href="image/kasuga_street1.jpg"><img src="image/kasuga_street1.jpg" alt="image1" width="256" /></a></td>
-            <td><a href="image/kasuga_street2.jpg"><img src="image/kasuga_street2.jpg" alt="image2" width="256" /></a></td>
-          </tr>
-          <tr><td colspan="2">(それぞれ右クリックして「名前をつけてリンク先を保存」)</td></tr>
-        </table>
+        時間に余裕がある人は下記画像のように，前景及び背景の初期シードをマウスのドラッグ操作で指定できるようにしてみよう．
+		また，単純な矩形を初期値にした場合ではうまくいかない画像(画像処理でよく使われるLena画像など)を探して，
+    マウスによる指定を試してみよう．<br />
+    (Google colabratory + Pythonの環境だとマウスによる指定は難しいので，別途自身で用意したストロークを書いたマスク画像を使うのでもOK)
+        <br />
+        マウスでシードを指定した例<br />
+        <a href="image/grabcut_rcube.jpg"><img src="image/grabcut_rcube.jpg" alt="seed image" width="256" /></a><br />
       </p>
       <p>
         <b>参考(OpenCVの関数)</b><br />
         <ul>
-          <li>
-            <strong>ホモグラフィ行列の計算と画像の射影変換</strong>
-            <pre class="code">Mat findHomography(InputArray src, InputArray dst, int method,
-                  double ransacReprojThreshold = 3)</pre>
-            <p>
-              (5つ目以降の引数は省略)<br />
-              対応する特徴点を格納した2つの配列(src,dst)からホモグラフィ行列(射影変換行列)を計算する．
-              結果の行列は返値として受け取る
-              (srcの点をx，dstの点をy，返値のホモグラフィ行列をMとすると，y = M xの関係となる)．
-              第3引数のmethodには計算方法を指定する．RANSACの場合はRANSACを指定する．RANSAC以外にLMedS推定(LMEDS)にも対応している．
-              第4引数のransacReprojThresholdはmethodにRANSACを指定した場合のみ有効で，特徴点のペアが外れ値かどうかを判別する閾値である．
-              ちなみに上記では省略している第5引数maskでRANSACで外れ値と判断されたかどうかの結果を受け取ることも可能．
-            </p>
-            <p>
-               特徴点の指定にはInputArray型変数で渡す必要がある．これは配列を使った入力全般を表し，
-               Matやvector&#060;Point2f>など様々な形式の配列に対応している．
-               ただし，マッチング結果を格納する特殊な型の配列であるvector&#060;cv::DMatch>には当然対応していない．
-               そのため，for文を使ってMatやvector&#060;Point2f>の配列に入れ直す必要がある．
-            </p>
-            <pre class="code">void warpPerspective(InputArray src, OutputArray dst, InputArray M, Size dsize,
-                     int flags = INTER_LINEAR, int borderMode = BORDER_CONSTANT,
-                     const Scalar& borderValue = Scalar())</pre>
-            <p>
-               (6つ目以降の引数は省略)<br />
-               ホモグラフィ行列Mに従って入力画像srcを射影変換し，結果を出力画像dstに格納する．
-               第4引数dsizeには出力画像のサイズを指定する(合成した画像が切れないように元画像の横幅1.5～2倍程度，縦幅1.1～1.5倍程度を指定しておく)．
-               第5引数のflagsは射影変換後の画像を画素に格納するときの補間方法を指定する
-               (デフォルトは線形補間(INTER_LINEAR)で他に双三次補間(INTER_CUBE)や8x8のLanczos法(INTER_LANCZOS4)も指定できる)．
-               flagsには補間方法に加えてWARP_INVERSE_MAPを指定することで逆変換(M^(-1))にすることもできる．
-               この場合はOR演算子"|"を使って，INTER_LINEAR|WARP_INVERSE_MAPのように指定する．
-               第6,第7引数ではborderModeでピクセルの外挿方法を指定し，これがBORDER_CONSTANTの場合にその色をborderValueとして指定する．
-            </p>
-          </li>
+		  <li>マウスコールバック<br />
+             <pre class="code">void setMouseCallback(const string& winname, MouseCallback onMouse, void* userdata)</pre>
+             <p>
+			   マウスコールバック関数を指定する．マウスコールバック関数とは，winnameで指定したウィンドウ上で，
+			   何らかのマウス操作(クリックやドラッグ)をしたときに呼ばれる関数を指定する．
+		     </p>
+		     <p>
+			   引数onMouseに自分で作った関数の名前を指定すればよい．
+			   ただし，関数の形式(返値,引数など)は決まっている点には注意．
+			   以下にマウスコールバック関数の例を示す．
+             </p>
+			 <pre class="code">/*!
+ * マウスコールバック関数
+ * @param[in] event マウスイベントID:EVENT_LBUTTONDOWN,RBUTTONDOWN,LBUTTONUP,RBUTTONUP,MOUSEMOVE
+ * @param[in] x,y マウス座標
+ * @param[in] flags Shift,Ctrlなどの修飾キーの状態:EVENT_FLAG_CTRLKEY,SHIFTKEY
+ * @param[in] param ユーザーデータ
+ */
+void onMouse(int event, int x, int y, int flags, void* param)
+{
+	static int state = 0;
+	switch(event){
+	case EVENT_LBUTTONDOWN:
+		// マウス左ボタンが"押された"ときの処理をここに書く
+		// 引数x,yにはそのときのマウス座標が格納されている
+		・・・
+		state = 1;
+		break;
+	case EVENT_LBUTTONUP:
+		// マウス左ボタンが"離された"ときの処理をここに書く
+		・・・
+		state = 0;
+		break;
+	case EVENT_MOUSEMOVE:
+		// マウスが動いたときの処理をここに書く
+		// 注意としてドラッグ(ボタンを押したまま移動)時だけでなく，
+		// ボタンを押さないで動かした場合も呼ばれてるので，
+		// ドラッグを検出するためにここではstateというstatic変数を用いている．
+		if(state){
+			・・・
+		}
+		break;
+	}
+}</pre>
+           </li>
         </ul>
       </p>
       <p>
-        <strong>ヒント : </strong> パノラマ画像生成では2枚の画像の特徴点を抽出し，そのマッチングを行った後，
-        findHomography関数で特徴点間のホモグラフィ行列を計算し，warpPerspectiveで片方の画像を投影変換，もう一方の画像をそちらに貼り付ければよい．
-        処理のイメージを下図に示す．2枚の画像をそれぞれimg1,img2としてMat H = findHomography(img1, img2, RANSAC);
-        でホモグラフィ行列を計算した場合の例である．この場合，img2をH^(-1)で投影変換した結果にimg1を重ねればよい．
-        <br />
-        <img src="image/cv_pano.jpg" alt="image composition" width="640" /><br />
-        img1を変換後のimg2に配置するにはwarpPerspectiveの第三引数の変換行列に単位行列を渡してやればよい．
-        注意としてこのときに第6引数のborderModeにBORDER_CONSTANTを指定してしまうと，
-        すでに配置されたimg2がborderValueで上書きされてしまうので，
-        BORDER_TRANSPARENTを指定するように．単位行列の生成にはMatクラスの関数eyeを使えばよい(下記例参照)．
-        <pre class="code">Mat I = Mat::eye(3, 3, CV_64F); // 単位行列生成
-// img2を変形した画像pano_imgにimg1を配置
-warpPerspective(img1, pano_img, I, dsize, INTER_LINEAR, BORDER_TRANSPARENT);</pre>
+        <strong>ヒント : </strong> マウス座標によってマスクを変更するには，
+		circle関数などの図形描画関数を用いるとよい．
+		例えば，マウスでクリックした位置(x,y)を中心とした半径3ピクセルの領域を前景シードとするには，
       </p>
+	  <pre class="code">circle(mask, Point(x,y), 3, GC_FGD, -1);</pre>
+	  <p>
+		とすればよい(背景シードの場合はGC_BGDを指定)．最後の引数を-1としているのは円の中身を指定した色で埋めるためである．
+		これをマウスクリック時やドラッグ時に指定する．
+	  </p>
+	  <p>
+        マウスで指定したシード領域を描画に反映させたい場合は，書くピクセル毎にマスクの値で値を変えてやればよい．
+		描画用の画像をimgとすると，
+      </p>
+	  <pre class="code">for(int j = 0; j < img.rows; ++j){
+	for(int i = 0; i < img.cols; ++i){
+		if(mask.at<uchar>(j, i) == GC_FGD){
+			img.at<cv::Vec3b>(j, i)[0] = cv::saturate_cast<uchar>(200);
+			img.at<cv::Vec3b>(j, i)[1] = cv::saturate_cast<uchar>(200);
+			img.at<cv::Vec3b>(j, i)[2] = cv::saturate_cast<uchar>(200);
+		}
+		else if(mask.at<uchar>(j, i) == GC_BGD){
+			img.at<cv::Vec3b>(j, i)[0] = cv::saturate_cast<uchar>(100);
+			img.at<cv::Vec3b>(j, i)[1] = cv::saturate_cast<uchar>(100);
+			img.at<cv::Vec3b>(j, i)[2] = cv::saturate_cast<uchar>(100);
+		}
+	}
+}</pre>
+	  <p>
+		とすると，前景シード領域を明るい灰色，背景シード領域を暗い灰色にしてくれる．
+	  </p>
       <p><br /></p>
-
 
 
 
@@ -402,15 +364,15 @@ warpPerspective(img1, pano_img, I, dsize, INTER_LINEAR, BORDER_TRANSPARENT);</pr
       <h2>レポート</h2>
       <p>
         演習課題1と2(+やった人はオプション課題)について，画像処理した画像，元画像，使用した手法・パラメータなどの説明，結果に対する考察をまとめて，
-        レポートとしてPDFにしたものを<a href="https://manaba.tsukuba.ac.jp/ct/course_2911343">manaba「画像・映像情報処理」</a>の「レポート」
-        の「実習（後半）レポート（締め切り12/27(水)21:00）」に提出せよ．
-        なお，作成したソースコード(.c/.cppファイル)も提出すること(ソースコードのファイル数が多くなる場合はZIPかTARでまとめてから提出)<br />
+        レポートとしてPDFにしたものを<a href="https://manaba.tsukuba.ac.jp/ct/course_3319791">manaba「画像・映像情報処理」</a>の「レポート」
+        の「後半の実習レポート（締め切り12/27(金) 17:00）」に提出せよ．
+        なお，<strong>作成したコードをレポートに載せること</strong>(ソースコードのファイル(.c/.cppファイル)を一緒に提出するのでもかまわない)<br />
         <br />
-        レポートの締め切りは<strong>2023年12月27(水) 21:00</strong>までとする．
+        レポートの締め切りは<strong>2024年12月27日(金) 17:00</strong>までとする．
         間に合わなかった場合も1週間はmanaba上で提出を受け付ける(ただし減点あり)が，それ以降は受け取らない．
       </p>
       <p><br /></p>
--->
+
 
   	  <a name="note" id="note"></a>
       <h2>注意事項</h2>
